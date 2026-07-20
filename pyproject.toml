@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unlockshortcut"
-version = "1.0.0"
+version = "1.1.0"
 description = "Run a macOS Shortcut after the first screen unlock each day."
 requires-python = ">=3.11"
 dependencies = ["pyobjc-framework-Cocoa>=11,<12"]

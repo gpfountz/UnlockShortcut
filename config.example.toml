@@ -3,9 +3,5 @@
 # The existing Shortcut to run after the first unlock of each local calendar day.
 shortcut_name = "WANUsage"
 
-# This text is supplied to Shortcut Input only when UnlockShortcut invokes it.
-# Put an If action at the top of WANUsage that checks for this exact value.
-daemon_input = "unlockshortcut"
-
 # This macOS notification is not a public API. Keep it configurable for beta releases.
 unlock_notification = "com.apple.screenIsUnlocked"
