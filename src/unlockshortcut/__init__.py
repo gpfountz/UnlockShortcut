@@ -1,0 +1,1 @@
+"""UnlockShortcut package."""
