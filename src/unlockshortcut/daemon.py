@@ -34,7 +34,6 @@ class Configuration:
     """Configuration read from config.toml."""
 
     shortcut_name: str
-    daemon_input: str
     unlock_notification: str
 
 
@@ -58,7 +57,6 @@ def load_configuration(path: Path = CONFIG_PATH) -> Configuration:
         values: dict[str, object] = tomllib.load(config_file)
     return Configuration(
         shortcut_name=_required_text(values, "shortcut_name"),
-        daemon_input=_required_text(values, "daemon_input"),
         unlock_notification=_optional_text(
             values, "unlock_notification", DEFAULT_UNLOCK_NOTIFICATION
         ),
@@ -104,7 +102,6 @@ class DailyRunner:
         logging.info("Screen unlocked; running Shortcut %r", self._configuration.shortcut_name)
         result: subprocess.CompletedProcess[str] = self._execute(
             [SHORTCUTS_EXECUTABLE, "run", self._configuration.shortcut_name],
-            input=f"{self._configuration.daemon_input}\n",
             capture_output=True,
             check=False,
             text=True,

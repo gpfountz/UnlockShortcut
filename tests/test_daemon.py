@@ -17,13 +17,13 @@ def test_runs_shortcut_and_records_success(tmp_path: Path) -> None:
         return subprocess.CompletedProcess(args=args[0], returncode=0, stdout="", stderr="")
 
     state_path: Path = tmp_path / "state.json"
-    configuration: Configuration = Configuration("WANUsage", "unlockshortcut", "event")
+    configuration: Configuration = Configuration("WANUsage", "event")
     runner: DailyRunner = DailyRunner(configuration, state_path, execute)
 
     runner.handle_unlock()
 
     assert calls[0]["args"] == ([SHORTCUTS_EXECUTABLE, "run", "WANUsage"],)
-    assert calls[0]["kwargs"]["input"] == "unlockshortcut\n"
+    assert "input" not in calls[0]["kwargs"]
     assert json.loads(state_path.read_text()) == {"completed_date": date.today().isoformat()}
 
 
@@ -34,5 +34,5 @@ def test_does_not_rerun_after_success_on_same_day(tmp_path: Path) -> None:
     def execute(*_args: Any, **_kwargs: Any) -> subprocess.CompletedProcess[str]:
         raise AssertionError("Shortcut should not run")
 
-    configuration: Configuration = Configuration("WANUsage", "unlockshortcut", "event")
+    configuration: Configuration = Configuration("WANUsage", "event")
     DailyRunner(configuration, state_path, execute).handle_unlock()

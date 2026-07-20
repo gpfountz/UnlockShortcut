@@ -10,23 +10,11 @@ each local calendar day. Its runtime files are deliberately kept together in
 No duplicate Shortcut is needed. The daemon runs:
 
 ```text
-printf 'unlockshortcut\\n' | /usr/bin/shortcuts run WANUsage
+/usr/bin/shortcuts run WANUsage
 ```
 
-Apple documents that text piped into `shortcuts run` becomes Shortcut Input.
-In the `WANUsage` Shortcut, add this as its first conditional:
-
-```text
-If Shortcut Input is unlockshortcut
-    Run the normal daily WANUsage workflow and show its alert
-Otherwise
-    Keep the current Spotlight/share-sheet behavior
-End If
-```
-
-The initial `If` lets this one Shortcut distinguish the daemon without changing
-how it behaves when you run it normally from Spotlight. Choose another marker in
-`config.toml` if `unlockshortcut` might be meaningful input to the Shortcut.
+UnlockShortcut records a successful run and does not invoke the Shortcut again
+until the next local calendar day.
 
 ## Install
 
@@ -48,9 +36,9 @@ cp config.example.toml ~/.config/UnlockShortcut/config.toml
 chmod 600 ~/.config/UnlockShortcut/config.toml
 ```
 
-Edit the configuration if needed. By default it invokes `WANUsage`, supplies the
-`unlockshortcut` input marker, writes `state.json` only after successful
-completion, and writes `unlockshortcut.log` in the same directory.
+Edit the configuration if needed. By default it invokes `WANUsage`, writes
+`state.json` only after successful completion, and writes `unlockshortcut.log`
+in the same directory.
 
 Copy the LaunchAgent into place. It already uses the installed executable at
 `/usr/local/UnlockStorage/.venv/bin/unlockshortcut`.
@@ -82,11 +70,10 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.pfountz.unlockshortc
 Run this once while logged in:
 
 ```zsh
-printf 'unlockshortcut\\n' | /usr/bin/shortcuts run WANUsage
+/usr/bin/shortcuts run WANUsage
 ```
 
-It should follow the daemon branch and show the expected alert. To inspect the
-daemon afterwards:
+It should show the expected alert. To inspect the daemon afterwards:
 
 ```zsh
 tail -f ~/.config/UnlockShortcut/unlockshortcut.log
