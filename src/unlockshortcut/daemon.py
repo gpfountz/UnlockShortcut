@@ -15,9 +15,9 @@ from typing import Final
 
 import objc
 from Foundation import (
-    NSDistributedNotificationCenter,
-    NSNotificationSuspensionBehaviorDeliverImmediately,
-    NSObject,
+    NSDistributedNotificationCenter, # type: ignore[import-not-found]
+    NSNotificationSuspensionBehaviorDeliverImmediately, # type: ignore[import-not-found]
+    NSObject, # type: ignore[import-not-found]
 )
 from PyObjCTools import AppHelper
 
@@ -128,7 +128,7 @@ class UnlockObserver(NSObject):  # type: ignore[misc]
     """Bridge macOS notifications to the typed application runner."""
 
     def initWithRunner_(self, event_runner: DailyRunner) -> UnlockObserver:
-        objc.super(UnlockObserver, self).init()
+        objc.super(UnlockObserver, self).init() # type: ignore[import-not-found]
         self._event_runner: DailyRunner = event_runner
         return self
 
