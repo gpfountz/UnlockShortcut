@@ -1,7 +1,7 @@
 # Copy this file to ~/.config/UnlockShortcut/config.toml.
 
-# The existing Shortcut to run after the first unlock of each local calendar day.
-shortcut_name = "WANUsage"
+# The Shortcuts to run, in order, after the first unlock of each local calendar day.
+shortcut_names = ["WANUsage", "Fetch Daily Sudoku"]
 
 # This macOS notification is not a public API. Keep it configurable for beta releases.
 unlock_notification = "com.apple.screenIsUnlocked"

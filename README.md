@@ -1,20 +1,27 @@
 # UnlockShortcut
 
 `UnlockShortcut` is a small, typed Python LaunchAgent daemon. It listens for the
-macOS screen-unlock notification and invokes a Shortcut after the first unlock of
-each local calendar day. Its runtime files are deliberately kept together in
-`~/.config/UnlockShortcut`.
+macOS screen-unlock notification and invokes an ordered list of Shortcuts after
+the first unlock of each local calendar day. Its runtime files are deliberately
+kept together in `~/.config/UnlockShortcut`.
 
-## Use the existing `WANUsage` Shortcut
+## Configure the daily Shortcuts
 
-No duplicate Shortcut is needed. The daemon runs:
+The default configuration runs:
 
 ```text
 /usr/bin/shortcuts run WANUsage
+/usr/bin/shortcuts run "Fetch Daily Sudoku"
 ```
 
-UnlockShortcut records a successful run and does not invoke the Shortcut again
-until the next local calendar day.
+`Fetch Daily Sudoku` should contain a **Run Shell Script** action with:
+
+```zsh
+/Users/greg/Applications/Sudoku.app/Contents/MacOS/Sudoku --fetch-daily
+```
+
+UnlockShortcut saves progress after each successful Shortcut. If a later one
+fails, the next unlock resumes there without repeating earlier successes.
 
 ## Install
 
@@ -36,9 +43,10 @@ cp config.example.toml ~/.config/UnlockShortcut/config.toml
 chmod 600 ~/.config/UnlockShortcut/config.toml
 ```
 
-Edit the configuration if needed. By default it invokes `WANUsage`, writes
-`state.json` only after successful completion, and writes `unlockshortcut.log`
-in the same directory.
+Edit the configuration if needed. `shortcut_names` defines the execution order.
+The earlier singular `shortcut_name` key remains supported for existing installs.
+Runtime progress is stored in `state.json`, and logs are written to
+`unlockshortcut.log` in the same directory.
 
 Copy the LaunchAgent into place. It already uses the installed executable at
 `/usr/local/UnlockStorage/.venv/bin/unlockshortcut`.
@@ -70,7 +78,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.pfountz.unlockshortc
 Run this once while logged in:
 
 ```zsh
-/usr/bin/shortcuts run WANUsage
+/usr/bin/shortcuts run "Fetch Daily Sudoku"
 ```
 
 It should show the expected alert. To inspect the daemon afterwards:
