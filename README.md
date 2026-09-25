@@ -11,13 +11,6 @@ The default configuration runs:
 
 ```text
 /usr/bin/shortcuts run WANUsage
-/usr/bin/shortcuts run "Fetch Daily Sudoku"
-```
-
-`Fetch Daily Sudoku` should contain a **Run Shell Script** action with:
-
-```zsh
-/Users/greg/Applications/Sudoku.app/Contents/MacOS/Sudoku --fetch-daily
 ```
 
 UnlockShortcut saves progress after each successful Shortcut. If a later one
@@ -78,7 +71,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.pfountz.unlockshortc
 Run this once while logged in:
 
 ```zsh
-/usr/bin/shortcuts run "Fetch Daily Sudoku"
+/usr/bin/shortcuts run WANUsage
 ```
 
 It should show the expected alert. To inspect the daemon afterwards:

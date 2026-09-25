@@ -24,17 +24,17 @@ def test_runs_shortcuts_in_order_and_records_success(tmp_path: Path) -> None:
         return subprocess.CompletedProcess(args=args[0], returncode=0, stdout="", stderr="")
 
     state_path: Path = tmp_path / "state.json"
-    configuration: Configuration = Configuration(("WANUsage", "Fetch Daily Sudoku"), "event")
+    configuration: Configuration = Configuration(("WANUsage", "Archive Notes"), "event")
     runner: DailyRunner = DailyRunner(configuration, state_path, execute)
 
     runner.handle_unlock()
 
     assert calls[0]["args"] == ([SHORTCUTS_EXECUTABLE, "run", "WANUsage"],)
-    assert calls[1]["args"] == ([SHORTCUTS_EXECUTABLE, "run", "Fetch Daily Sudoku"],)
+    assert calls[1]["args"] == ([SHORTCUTS_EXECUTABLE, "run", "Archive Notes"],)
     assert "input" not in calls[0]["kwargs"]
     assert json.loads(state_path.read_text()) == {
         "completed_date": date.today().isoformat(),
-        "completed_shortcuts": ["WANUsage", "Fetch Daily Sudoku"],
+        "completed_shortcuts": ["WANUsage", "Archive Notes"],
         "run_date": date.today().isoformat(),
     }
 
@@ -56,29 +56,27 @@ def test_resumes_after_failed_shortcut_without_repeating_success(tmp_path: Path)
     def execute(command: list[str], **_kwargs: Any) -> subprocess.CompletedProcess[str]:
         shortcut_name: str = command[-1]
         calls.append(shortcut_name)
-        return_code: int = 1 if shortcut_name == "Fetch Daily Sudoku" and len(calls) == 2 else 0
+        return_code: int = 1 if shortcut_name == "Archive Notes" and len(calls) == 2 else 0
         return subprocess.CompletedProcess(command, return_code, stdout="", stderr="failed")
 
     state_path: Path = tmp_path / "state.json"
-    configuration: Configuration = Configuration(("WANUsage", "Fetch Daily Sudoku"), "event")
+    configuration: Configuration = Configuration(("WANUsage", "Archive Notes"), "event")
     runner: DailyRunner = DailyRunner(configuration, state_path, execute)
 
     runner.handle_unlock()
     runner.handle_unlock()
 
-    assert calls == ["WANUsage", "Fetch Daily Sudoku", "Fetch Daily Sudoku"]
+    assert calls == ["WANUsage", "Archive Notes", "Archive Notes"]
     assert json.loads(state_path.read_text())["completed_date"] == date.today().isoformat()
 
 
 def test_loads_shortcut_name_list(tmp_path: Path) -> None:
     config_path: Path = tmp_path / "config.toml"
-    config_path.write_text(
-        'shortcut_names = ["WANUsage", "Fetch Daily Sudoku"]\n', encoding="utf-8"
-    )
+    config_path.write_text('shortcut_names = ["WANUsage", "Archive Notes"]\n', encoding="utf-8")
 
     configuration: Configuration = load_configuration(config_path)
 
-    assert configuration.shortcut_names == ("WANUsage", "Fetch Daily Sudoku")
+    assert configuration.shortcut_names == ("WANUsage", "Archive Notes")
 
 
 def test_loads_legacy_shortcut_name(tmp_path: Path) -> None:
