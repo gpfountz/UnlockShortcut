@@ -120,8 +120,3 @@ a documented public API. It is configurable as `unlock_notification` so the
 macOS 27 beta can be adapted if Apple changes it. The daemon records success
 only after `/usr/bin/shortcuts` exits successfully; a failure is retried on the
 next unlock.
-
-## Development
-
-See [VERSIONING.md](VERSIONING.md) for hook installation, the commit-time versioning
-policy, and supported Git workflows.
