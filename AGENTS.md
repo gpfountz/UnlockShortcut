@@ -24,7 +24,7 @@ names and consistent formatting.
   `APP_VERSIONING_ALLOW_MAJOR=1` override. Keep platform build identifiers separate.
 - Do not bump versions on saves, builds, tests, or push attempts. Batch closure
   requires actual publication to the designated same-name `origin` branch.
-- Hooks are local and bypassable. See README for installation, supported Git
+- Hooks are local and bypassable. See VERSIONING.md for installation, supported Git
   operations, recovery, and manual-major instructions.
 - Run existing daemon tests and disposable-repository versioning tests before
   delivering changes. This guidance does not authorize commits, pushes, deployment,

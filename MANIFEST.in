@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Greg Pfountz
 # SPDX-License-Identifier: GPL-3.0-only
-include LICENSE COPYRIGHT.md CONTRIBUTING.md README.md AGENTS.md
+include LICENSE COPYRIGHT.md CONTRIBUTING.md README.md AGENTS.md VERSIONING.md
 include .gitattributes .gitignore config.example.toml
 recursive-include launchd *.plist
 recursive-include scripts *.py

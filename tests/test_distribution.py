@@ -157,6 +157,7 @@ def test_built_source_archive_contains_complete_project_materials(artifacts: Pat
             "COPYRIGHT.md",
             "CONTRIBUTING.md",
             "README.md",
+            "VERSIONING.md",
             "AGENTS.md",
             "pyproject.toml",
             "MANIFEST.in",

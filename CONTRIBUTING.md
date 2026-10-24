@@ -20,6 +20,7 @@ the treatment of applicable interactive legal notices.
 Use typed Python and focused, documented functions. Follow [AGENTS.md](AGENTS.md)
 and run the daemon, legal-resource, and versioning tests. Version changes belong
 to commit-time batches; licensing edits do not require a manually allocated major.
+See [VERSIONING.md](VERSIONING.md) for the versioning workflow.
 
 Before distributing an artifact, identify its exact source revision and retain
 the source, build instructions, installation materials, and dependencies needed
