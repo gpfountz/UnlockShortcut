@@ -1,0 +1,31 @@
+{
+  "review_date": "2026-10-24",
+  "scope": "Notice snapshots for separately installed dependencies; no dependency code is bundled in the UnlockShortcut wheel.",
+  "notice": {
+    "path": "PyObjC-LICENSE.txt",
+    "sha256": "0ca04b07928d4872b9d9bb22187ca0426dd8bfab08f26eada0999a71dc81aaff"
+  },
+  "dependencies": [
+    {
+      "name": "pyobjc-framework-Cocoa",
+      "version": "11.1",
+      "license": "MIT",
+      "notice_source": "pyobjc_framework_cocoa-11.1.dist-info/licenses/LICENSE.txt",
+      "upstream": "https://pypi.org/project/pyobjc-framework-Cocoa/11.1/"
+    },
+    {
+      "name": "pyobjc-core",
+      "version": "12.2.1",
+      "license": "MIT",
+      "notice_source": "pyobjc_core-12.2.1/License.txt",
+      "source_archive": {
+        "url": "https://files.pythonhosted.org/packages/b4/b1/729f7458a63758bd21716648a8abcd9a0c8f2d2e9897763c8a1a1c7fd31b/pyobjc_core-12.2.1.tar.gz",
+        "sha256": "7a7b9b018402342cf32bf1956366896350fbe5c0478cb3ef59778f77abed7f07",
+        "filename": "pyobjc_core-12.2.1.tar.gz"
+      },
+      "installed_license_omitted": true,
+      "observed_platform_tag": "cp314-cp314-macosx_10_15_universal2",
+      "observed_libffi": "/usr/lib/libffi.dylib (dynamically linked system library)"
+    }
+  ]
+}

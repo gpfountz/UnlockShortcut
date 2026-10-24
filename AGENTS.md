@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: 2026 Greg Pfountz -->
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+
 # Project guidance
 
 Use Python for new automation. Annotate variables and function signatures, give
@@ -26,3 +29,14 @@ names and consistent formatting.
 - Run existing daemon tests and disposable-repository versioning tests before
   delivering changes. This guidance does not authorize commits, pushes, deployment,
   history rewriting, or changes to GitHub settings.
+
+## Licensing
+
+- Original project material uses GPL-3.0-only, credited to Greg Pfountz (2026).
+  Preserve other contributors' notices and separate third-party terms.
+- Keep the root `LICENSE` identical to the packaged copy in
+  `src/unlockshortcut/licenses/LICENSE`; preserve upstream notice bytes.
+- Package offline legal resources and test `--license` and
+  `--third-party-notices` from real wheel and source artifacts when packaging changes.
+- Never treat license adoption as authorization to publish, change repository
+  visibility, distribute dependencies, or deploy over the working LaunchAgent.

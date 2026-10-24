@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Greg Pfountz
+# SPDX-License-Identifier: GPL-3.0-only
+# See LICENSE for license terms and the warranty disclaimer.
 """A launchd-friendly daemon that invokes Shortcuts on the first unlock each day."""
 
 from __future__ import annotations

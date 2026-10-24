@@ -1,1 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Greg Pfountz
+# SPDX-License-Identifier: GPL-3.0-only
+# See LICENSE for license terms and the warranty disclaimer.
 src/unlockshortcut/_version.py merge=app-version
+LICENSE -text -whitespace
+src/unlockshortcut/licenses/LICENSE -text -whitespace
+src/unlockshortcut/licenses/third-party/PyObjC-LICENSE.txt -text -whitespace

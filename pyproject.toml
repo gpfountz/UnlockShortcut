@@ -1,19 +1,34 @@
+# SPDX-FileCopyrightText: 2026 Greg Pfountz
+# SPDX-License-Identifier: GPL-3.0-only
+# See LICENSE for license terms and the warranty disclaimer.
 [build-system]
-requires = ["setuptools>=77"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "unlockshortcut"
 dynamic = ["version"]
 description = "Run macOS Shortcuts after the first screen unlock each day."
+readme = "README.md"
+authors = [{name = "Greg Pfountz"}]
+license = "GPL-3.0-only"
+license-files = [
+  "LICENSE",
+  "COPYRIGHT.md",
+  "src/unlockshortcut/licenses/THIRD_PARTY_NOTICES.md",
+  "src/unlockshortcut/licenses/third-party/*",
+]
 requires-python = ">=3.11"
 dependencies = ["pyobjc-framework-Cocoa>=11,<12"]
 
 [project.scripts]
-unlockshortcut = "unlockshortcut.daemon:main"
+unlockshortcut = "unlockshortcut.cli:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "unlockshortcut._version.__version__"}
+
+[tool.setuptools.package-data]
+unlockshortcut = ["licenses/*", "licenses/third-party/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

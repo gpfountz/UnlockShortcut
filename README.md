@@ -1,9 +1,44 @@
+<!-- SPDX-FileCopyrightText: 2026 Greg Pfountz -->
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+
 # UnlockShortcut
 
 `UnlockShortcut` is a small, typed Python LaunchAgent daemon. It listens for the
 macOS screen-unlock notification and invokes an ordered list of Shortcuts after
 the first unlock of each local calendar day. Its runtime files are deliberately
 kept together in `~/.config/UnlockShortcut`.
+
+## License and legal notices
+
+Copyright © 2026 Greg Pfountz. UnlockShortcut is licensed under
+[GPL-3.0-only](LICENSE), with no warranty as described in the full license.
+See [copyright and scope](COPYRIGHT.md), [reuse and contributions](CONTRIBUTING.md),
+and [third-party notices](src/unlockshortcut/licenses/THIRD_PARTY_NOTICES.md).
+
+After installing this version, read the full notices offline without starting
+the daemon or running any Shortcuts:
+
+```zsh
+/usr/local/UnlockStorage/.venv/bin/unlockshortcut --license
+/usr/local/UnlockStorage/.venv/bin/unlockshortcut --third-party-notices
+/usr/local/UnlockStorage/.venv/bin/unlockshortcut --version
+```
+
+For a source checkout, use `.venv/bin/python -m unlockshortcut.cli` with
+`PYTHONPATH=src` and the same options. Running the installed command with no options
+starts the daemon as before.
+
+To verify distributions, use a development environment with the `build` frontend
+available, then run:
+
+```zsh
+python -m build --outdir /private/tmp/unlockshortcut-dist-check
+UNLOCKSHORTCUT_ARTIFACTS=/private/tmp/unlockshortcut-dist-check .venv/bin/python -m pytest
+```
+
+The artifact tests inspect both the wheel and source archive and run legal
+commands from an extracted wheel without installing it. Without that environment
+variable, ordinary tests skip only the optional built-artifact checks.
 
 ## Configure the daily Shortcuts
 

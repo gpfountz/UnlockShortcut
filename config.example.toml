@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Greg Pfountz
+# SPDX-License-Identifier: GPL-3.0-only
+# See LICENSE for license terms and the warranty disclaimer.
 # Copy this file to ~/.config/UnlockShortcut/config.toml.
 
 # The Shortcuts to run, in order, after the first unlock of each local calendar day.
