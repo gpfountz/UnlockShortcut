@@ -4,13 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unlockshortcut"
-version = "1.2.0"
+dynamic = ["version"]
 description = "Run macOS Shortcuts after the first screen unlock each day."
 requires-python = ">=3.11"
 dependencies = ["pyobjc-framework-Cocoa>=11,<12"]
 
 [project.scripts]
 unlockshortcut = "unlockshortcut.daemon:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "unlockshortcut._version.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
