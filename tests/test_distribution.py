@@ -169,6 +169,7 @@ def test_built_source_archive_contains_complete_project_materials(artifacts: Pat
     ]
     for directory in ("src", "scripts", "tests"):
         required.extend((PROJECT / directory).rglob("*.py"))
+    required.extend((PROJECT / "scripts").rglob("*.sh"))
     required.extend(path for path in (PROJECT / RESOURCE_PREFIX).rglob("*") if path.is_file())
     for source in required:
         relative: str = source.relative_to(PROJECT).as_posix()

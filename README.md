@@ -51,50 +51,67 @@ The default configuration runs:
 UnlockShortcut saves progress after each successful Shortcut. If a later one
 fails, the next unlock resumes there without repeating earlier successes.
 
-## Install
+## Deploy or update
 
-Build a wheel from this checkout, then install that wheel into the dedicated
-deployment directory. The LaunchAgent runs the installed copy, not the source
-checkout.
+While logged into your macOS desktop, run this from the checkout as your normal
+user (without `sudo`):
 
 ```zsh
 cd /Users/greg/Library/CloudStorage/SynologyDrive-home/Codex/UnlockShortcut
-.venv/bin/python -m pip wheel . -w dist
-sudo mkdir -p /usr/local/UnlockStorage
-sudo python3 -m venv /usr/local/UnlockStorage/.venv
-sudo /usr/local/UnlockStorage/.venv/bin/python -m pip install --upgrade pip
-sudo /usr/local/UnlockStorage/.venv/bin/python -m pip install --upgrade \
-  dist/unlockshortcut-<version>-py3-none-any.whl
-mkdir -p ~/.config/UnlockShortcut
-chmod 700 ~/.config/UnlockShortcut
-cp config.example.toml ~/.config/UnlockShortcut/config.toml
-chmod 600 ~/.config/UnlockShortcut/config.toml
+./scripts/deploy.sh
 ```
 
-Edit the configuration if needed. `shortcut_names` defines the execution order.
-The earlier singular `shortcut_name` key remains supported for existing installs.
-Runtime progress is stored in `state.json`, and logs are written to
-`unlockshortcut.log` in the same directory.
+The script can also be called by its absolute path from another directory.
+It uses the checkout's `.venv/bin/python` when available, otherwise `python3`;
+Python 3.11 or newer, pip, internet access for building/downloading dependencies,
+and permission to use `sudo` are required. Use `./scripts/deploy.sh --help` for help.
 
-Copy the LaunchAgent into place. It already uses the installed executable at
-`/usr/local/UnlockStorage/.venv/bin/unlockshortcut`.
+The script automatically detects a new installation or an update from the
+existing deployment environment or installed LaunchAgent plist. On each run it:
 
-```zsh
-cp launchd/com.pfountz.unlockshortcut.plist \
-  ~/Library/LaunchAgents/com.pfountz.unlockshortcut.plist
-```
+1. Builds the current checkout into a temporary wheel directory and downloads
+   dependencies before stopping a running daemon. Updates build with the existing
+   deployment interpreter so dependency wheels match its Python version.
+2. Creates `/usr/local/UnlockStorage/.venv` when needed and installs the wheel and
+   dependencies there, using `sudo` only for application installation. It reinstalls
+   the current checkout even if its version has not changed.
+3. Creates private `~/.config/UnlockShortcut/config.toml` defaults only when missing.
+   Existing configuration, daily progress in `state.json`, and logs are preserved.
+4. Checks dependencies, offline legal commands, and configuration, then copies
+   the repository's LaunchAgent settings into `~/Library/LaunchAgents`, adapting
+   executable and log paths for the current user.
+5. Enables and loads the LaunchAgent for the current GUI login session. On updates,
+   it first unloads any running job so application and plist changes take effect.
+   It checks that the new daemon is running before reporting success.
 
-Then load it for the current GUI login session:
+The LaunchAgent runs the installed copy. No application version is changed by
+deployment. If installation or startup fails after the old job was unloaded, the
+script reports failure; it does not roll back the installed packages. Correct the
+reported error, inspect `~/.config/UnlockShortcut/launchd.err.log` and
+`~/.config/UnlockShortcut/unlockshortcut.log`, then rerun `./scripts/deploy.sh`.
+
+Edit `~/.config/UnlockShortcut/config.toml` as needed and rerun the script to
+restart the daemon with the changes. `shortcut_names` defines execution order;
+the earlier singular `shortcut_name` key remains supported.
+
+### Load it for the current GUI login session
+
+`deploy.sh` performs this automatically. To load an already installed, unloaded
+job manually:
 
 ```zsh
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.pfountz.unlockshortcut.plist
 ```
 
-For later upgrades, build a new wheel and rerun the `pip install --upgrade`
-command above with its new versioned filename. The LaunchAgent does not need to
-be reloaded because the executable path remains unchanged.
+### After editing the plist
 
-After editing the plist, replace the loaded job with:
+Edit `launchd/com.pfountz.unlockshortcut.plist` in the repository, then rerun
+`./scripts/deploy.sh`. The script replaces the installed plist and reloads the
+job automatically, preserving template settings other than its executable and
+stdout/stderr log paths. Direct edits to the installed plist are overwritten by
+the next deployment; keep lasting changes in the repository template.
+
+If you edit only the installed plist, replace the loaded job manually with:
 
 ```zsh
 launchctl bootout gui/$(id -u)/com.pfountz.unlockshortcut

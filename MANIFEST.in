@@ -3,6 +3,6 @@
 include LICENSE COPYRIGHT.md CONTRIBUTING.md README.md AGENTS.md VERSIONING.md
 include .gitattributes .gitignore config.example.toml
 recursive-include launchd *.plist
-recursive-include scripts *.py
+recursive-include scripts *.py *.sh
 recursive-include tests *.py
 recursive-include src/unlockshortcut/licenses *
