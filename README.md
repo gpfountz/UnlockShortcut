@@ -58,35 +58,54 @@ user (without `sudo`):
 
 ```zsh
 cd /Users/greg/Library/CloudStorage/SynologyDrive-home/Codex/UnlockShortcut
+git pull
 ./scripts/deploy.sh
 ```
 
 The script can also be called by its absolute path from another directory.
 It uses the checkout's `.venv/bin/python` when available, otherwise `python3`;
-Python 3.11 or newer, pip, internet access for building/downloading dependencies,
+Python 3.11 or newer, pip, internet access for downloading dependencies,
 and permission to use `sudo` are required. Use `./scripts/deploy.sh --help` for help.
 
 The script automatically detects a new installation or an update from the
 existing deployment environment or installed LaunchAgent plist. On each run it:
 
-1. Builds the current checkout into a temporary wheel directory and downloads
-   dependencies before stopping a running daemon. Updates build with the existing
-   deployment interpreter so dependency wheels match its Python version.
-2. Creates `/usr/local/UnlockStorage/.venv` when needed and installs the wheel and
-   dependencies there, using `sudo` only for application installation. It reinstalls
-   the current checkout even if its version has not changed.
+1. Creates an isolated temporary virtual environment using the installed
+   deployment Python, or the wrapper's Python for a first installation. Pip reads
+   the build and runtime requirements from `pyproject.toml`, downloads their wheels,
+   and installs them into that environment. There is no separate requirements file
+   or lockfile. All declared pins and bounds remain unchanged; ranges can resolve
+   to newer versions within those bounds. No dependency files are rewritten, and
+   the checkout's development `.venv` is preserved. Compatible dependency wheels
+   must be available; source-only dependencies cause preflight to stop.
+2. Runs `pip check`, the canonical GPL and recorded upstream-notice integrity
+   checks, and the source CLI's offline legal commands before building. It then
+   builds the application with those prepared requirements, without a separate
+   build-isolation download or dependency resolution, and installs the result into
+   the temporary environment. It checks dependencies, packaged legal commands,
+   and the existing configuration (or the example defaults) again. Any failure
+   here stops before `sudo`, daemon unloading, or installed-file changes.
 3. Creates private `~/.config/UnlockShortcut/config.toml` defaults only when missing.
    Existing configuration, daily progress in `state.json`, and logs are preserved.
-4. Checks dependencies, offline legal commands, and configuration, then copies
-   the repository's LaunchAgent settings into `~/Library/LaunchAgents`, adapting
+4. Unloads a running job, backs up the old application environment by renaming it,
+   and creates `/usr/local/UnlockStorage/.venv` using the same Python as preflight.
+   It installs the application and dependencies offline from the prepared wheels,
+   using `sudo` only for application installation. It reinstalls the current
+   checkout even if its version has not changed. Installation or validation failure
+   restores the previous environment and restarts a previously running job; a
+   failed first installation removes the incomplete environment. The temporary
+   environment backup is removed after installation and validation succeed.
+5. Copies the repository's LaunchAgent settings into `~/Library/LaunchAgents`, adapting
    executable and log paths for the current user.
-5. Enables and loads the LaunchAgent for the current GUI login session. On updates,
-   it first unloads any running job so application and plist changes take effect.
+6. Enables and loads the LaunchAgent for the current GUI login session.
    It checks that the new daemon is running before reporting success.
 
 The LaunchAgent runs the installed copy. No application version is changed by
-deployment. If installation or startup fails after the old job was unloaded, the
-script reports failure; it does not roll back the installed packages. Correct the
+deployment. Preflight failures leave the installed application and daemon untouched.
+Final offline installation failures restore the previous application environment;
+restoring files or restarting the old job can itself fail, and the script reports
+that error. Failures after a successful installation, such as plist replacement or
+LaunchAgent startup, do not roll back the new packages. Correct the
 reported error, inspect `~/.config/UnlockShortcut/launchd.err.log` and
 `~/.config/UnlockShortcut/unlockshortcut.log`, then rerun `./scripts/deploy.sh`.
 

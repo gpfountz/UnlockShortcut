@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
 import plistlib
 import shlex
@@ -12,6 +14,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import tomllib
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -104,17 +108,107 @@ def prepare_configuration(deployment: Deployment) -> None:
             stream.write(defaults)
 
 
-def build_wheels(deployment: Deployment, directory: Path) -> Path:
-    """Build the application and download dependency wheels before stopping the daemon."""
+def dependency_requirements(project: Path) -> list[str]:
+    """Read the existing build and runtime constraints without rewriting or relaxing them."""
+    with (project / "pyproject.toml").open("rb") as stream:
+        settings: dict[str, object] = tomllib.load(stream)
+    build: object = settings.get("build-system")
+    application: object = settings.get("project")
+    if not isinstance(build, dict) or not isinstance(application, dict):
+        raise ValueError("pyproject.toml must declare build-system and project requirements")
+    requirements: list[str] = []
+    group: object
+    for group in (build.get("requires"), application.get("dependencies")):
+        if not isinstance(group, list) or not all(isinstance(item, str) for item in group):
+            raise ValueError("Build and runtime requirements must be lists of strings")
+        requirements.extend(group)
+    return requirements
+
+
+def check_licenses(project: Path) -> None:
+    """Apply the existing canonical-license and recorded upstream-notice integrity checks."""
+    resources: Path = project / "src/unlockshortcut/licenses"
+    canonical: bytes = (project / "LICENSE").read_bytes()
+    if (
+        canonical != (resources / "LICENSE").read_bytes()
+        or hashlib.sha256(canonical).hexdigest()
+        != "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0"
+    ):
+        raise ValueError("Canonical GPL license integrity check failed")
+    provenance: dict[str, object] = json.loads(
+        (resources / "third-party/provenance.json").read_text(encoding="utf-8")
+    )
+    notice: object = provenance.get("notice")
+    snapshot: bytes = (resources / "third-party/PyObjC-LICENSE.txt").read_bytes()
+    if not isinstance(notice, dict) or hashlib.sha256(snapshot).hexdigest() != notice.get("sha256"):
+        raise ValueError("Upstream PyObjC notice integrity check failed")
+
+
+def prepare_dependencies(deployment: Deployment, directory: Path) -> Path:
+    """Install declared requirements in an isolated venv matching the deployment Python."""
     interpreter: str = str(deployment.python) if deployment.python.exists() else sys.executable
+    environment: Path = directory / "environment"
+    python: Path = environment / "bin/python"
+    wheels: Path = directory / "wheels"
+    wheels.mkdir()
+    print(
+        "Preparing isolated dependencies from pyproject.toml (keeping its constraints).", flush=True
+    )
+    run(interpreter, "-m", "venv", str(environment))
+    requirements: list[str] = dependency_requirements(deployment.project)
     run(
-        interpreter,
+        str(python),
+        "-m",
+        "pip",
+        "download",
+        "--only-binary=:all:",
+        "--dest",
+        str(wheels),
+        *requirements,
+    )
+    run(
+        str(python),
+        "-m",
+        "pip",
+        "install",
+        "--no-index",
+        "--find-links",
+        str(wheels),
+        *requirements,
+    )
+    print(
+        "Checking dependency consistency, license integrity, and source legal commands.", flush=True
+    )
+    run(str(python), "-m", "pip", "check")
+    check_licenses(deployment.project)
+    option: str
+    for option in ("--version", "--license", "--third-party-notices"):
+        run(
+            str(python),
+            "-I",
+            "-c",
+            "import sys; sys.path.insert(0, sys.argv.pop(1)); "
+            "from unlockshortcut.cli import main; raise SystemExit(main())",
+            str(deployment.project / "src"),
+            option,
+            capture=True,
+        )
+    return python
+
+
+def build_wheels(deployment: Deployment, directory: Path, python: Path) -> Path:
+    """Build with validated requirements, with no second resolver or isolated build download."""
+    print("Building UnlockShortcut with the validated dependencies.", flush=True)
+    run(
+        str(python),
         "-m",
         "pip",
         "wheel",
         str(deployment.project),
         "--wheel-dir",
         str(directory),
+        "--no-build-isolation",
+        "--no-deps",
     )
     wheels: list[Path] = list(directory.glob("unlockshortcut-*.whl"))
     if len(wheels) != 1:
@@ -122,11 +216,64 @@ def build_wheels(deployment: Deployment, directory: Path) -> Path:
     return wheels[0]
 
 
-def install_wheel(deployment: Deployment, wheel: Path) -> None:
-    """Install into the dedicated environment, including updates with an unchanged version."""
+def validate_wheel(deployment: Deployment, wheel: Path, python: Path) -> None:
+    """Check the built package and configuration before modifying any installed files."""
+    print("Validating the built application and configuration before deployment.", flush=True)
+    run(str(python), "-m", "pip", "install", "--no-index", "--no-deps", str(wheel))
+    validate_environment(deployment, python)
+
+
+def validate_environment(deployment: Deployment, python: Path) -> None:
+    """Check dependencies, offline commands, and configuration without starting the daemon."""
+    run(str(python), "-m", "pip", "check")
+    option: str
+    for option in ("--version", "--license", "--third-party-notices"):
+        run(str(python.parent / "unlockshortcut"), option, capture=True)
+    configuration: Path = deployment.configuration_directory / "config.toml"
+    if not configuration.exists():
+        configuration = deployment.project / "config.example.toml"
+    run(
+        str(python),
+        "-I",
+        "-c",
+        "import sys; from pathlib import Path; "
+        "from unlockshortcut.daemon import load_configuration; "
+        "load_configuration(Path(sys.argv[1]))",
+        str(configuration),
+        capture=True,
+    )
+
+
+def install_wheel(deployment: Deployment, wheel: Path, python: Path) -> None:
+    """Install offline into a fresh venv, restoring the previous one on validation failure."""
+    environment: Path = deployment.installation / ".venv"
+    backup: Path = deployment.installation / f".venv-backup-{uuid.uuid4().hex}"
+    existing: bool = environment.exists() or environment.is_symlink()
     run("/usr/bin/sudo", "/bin/mkdir", "-p", str(deployment.installation))
-    if not deployment.python.exists():
-        run("/usr/bin/sudo", sys.executable, "-m", "venv", str(deployment.installation / ".venv"))
+    if existing:
+        run("/usr/bin/sudo", "/bin/mv", str(environment), str(backup))
+    try:
+        run("/usr/bin/sudo", str(python), "-m", "venv", str(environment))
+        install_prepared_wheel(deployment, wheel)
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        run("/usr/bin/sudo", "/bin/rm", "-rf", str(environment))
+        if existing:
+            run("/usr/bin/sudo", "/bin/mv", str(backup), str(environment))
+            print("Restored the previous application environment.", flush=True)
+        raise
+    if existing:
+        cleanup: subprocess.CompletedProcess[str] = run(
+            "/usr/bin/sudo", "/bin/rm", "-rf", str(backup), check=False
+        )
+        if cleanup.returncode:
+            print(
+                f"Application installed; could not remove environment backup: {backup}", flush=True
+            )
+
+
+def install_prepared_wheel(deployment: Deployment, wheel: Path) -> None:
+    """Install only the prepared wheel set and verify the dedicated runtime environment."""
+    print("Installing the prepared application and dependencies offline.", flush=True)
     run(
         "/usr/bin/sudo",
         str(deployment.python),
@@ -136,21 +283,10 @@ def install_wheel(deployment: Deployment, wheel: Path) -> None:
         "--no-index",
         "--find-links",
         str(wheel.parent),
-        "--upgrade",
         "--force-reinstall",
         str(wheel),
     )
-    run(str(deployment.python), "-m", "pip", "check")
-    option: str
-    for option in ("--version", "--license", "--third-party-notices"):
-        run(str(deployment.executable), option, capture=True)
-    run(
-        str(deployment.python),
-        "-I",
-        "-c",
-        "from unlockshortcut.daemon import load_configuration; load_configuration()",
-        capture=True,
-    )
+    validate_environment(deployment, deployment.python)
 
 
 def replace_plist(destination: Path, contents: bytes) -> None:
@@ -180,7 +316,10 @@ def deploy(deployment: Deployment) -> None:
     print(f"UnlockShortcut deployment: {deployment.mode()}", flush=True)
     print(f"Application: {deployment.installation}\nLaunchAgent: {deployment.plist}", flush=True)
     with tempfile.TemporaryDirectory(prefix="unlockshortcut-deploy-") as directory:
-        wheel: Path = build_wheels(deployment, Path(directory))
+        python: Path = prepare_dependencies(deployment, Path(directory))
+        wheel: Path = build_wheels(deployment, Path(directory) / "wheels", python)
+        validate_wheel(deployment, wheel, python)
+        print("Preflight passed; updating the installed application and LaunchAgent.", flush=True)
         run("/usr/bin/sudo", "-v")
         prepare_configuration(deployment)
         loaded: bool = (
@@ -188,8 +327,10 @@ def deploy(deployment: Deployment) -> None:
         )
         if loaded:
             run(LAUNCHCTL, "bootout", deployment.service)
+        installed: bool = False
         try:
-            install_wheel(deployment, wheel)
+            install_wheel(deployment, wheel, python)
+            installed = True
             replace_plist(deployment.plist, contents)
             run(LAUNCHCTL, "enable", deployment.service)
             run(LAUNCHCTL, "bootstrap", deployment.domain, str(deployment.plist))
@@ -198,6 +339,8 @@ def deploy(deployment: Deployment) -> None:
             if not any(line.strip() == "state = running" for line in status.splitlines()):
                 raise ValueError("LaunchAgent did not stay running; inspect the logs")
         except (OSError, ValueError, subprocess.CalledProcessError):
+            if not installed and loaded and deployment.python.exists():
+                run(LAUNCHCTL, "bootstrap", deployment.domain, str(deployment.plist))
             print(
                 "Deployment failed; the daemon may be stopped. Correct the error and rerun "
                 "scripts/deploy.sh.\n"
@@ -215,7 +358,8 @@ def main() -> int:
         description=(
             "Install or update UnlockShortcut, apply the repository plist, and load it "
             "for the current GUI login session. Run without sudo; only application "
-            "installation requests sudo. Requires Python 3.11+."
+            "installation requests sudo. Synchronizes pyproject.toml dependencies and "
+            "validates them before building. Requires Python 3.11+."
         )
     )
     parser.parse_args()

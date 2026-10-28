@@ -3,4 +3,4 @@
 # See LICENSE for license terms and the warranty disclaimer.
 """Authoritative application version, shared by runtime and package metadata."""
 
-__version__: str = "1.2.4"
+__version__: str = "1.2.5"
