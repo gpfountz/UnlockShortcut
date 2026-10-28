@@ -90,8 +90,15 @@ script reports failure; it does not roll back the installed packages. Correct th
 reported error, inspect `~/.config/UnlockShortcut/launchd.err.log` and
 `~/.config/UnlockShortcut/unlockshortcut.log`, then rerun `./scripts/deploy.sh`.
 
-Edit `~/.config/UnlockShortcut/config.toml` as needed and rerun the script to
-restart the daemon with the changes. `shortcut_names` defines execution order;
+After editing `~/.config/UnlockShortcut/config.toml`, restart the loaded daemon
+as your normal user (without `sudo`):
+
+```zsh
+./scripts/restart.sh
+```
+
+The restart script can also be called by its absolute path from another directory.
+`shortcut_names` defines execution order;
 the earlier singular `shortcut_name` key remains supported.
 
 ### Load it for the current GUI login session
