@@ -8,21 +8,21 @@ code and legal documents, with no vendored dependency code or native libraries.
 The following dependencies are installed separately by pip and retain their
 upstream licenses and authorship.
 
-| Dependency | Observed version on 2026-10-26 | Upstream terms | Notice snapshot |
+| Dependency | Observed version on 2026-10-31 | Upstream terms | Notice snapshot |
 | --- | --- | --- | --- |
-| [pyobjc-framework-Cocoa](https://pypi.org/project/pyobjc-framework-Cocoa/12.2.2/) | 12.2.2 | MIT | `third-party/PyObjC-LICENSE.txt` |
-| [pyobjc-core](https://pypi.org/project/pyobjc-core/12.2.2/) | 12.2.2 | MIT | `third-party/PyObjC-LICENSE.txt` |
+| [pyobjc-framework-Cocoa](https://pypi.org/project/pyobjc-framework-Cocoa/13.0/) | 13.0 | MIT | `third-party/PyObjC-LICENSE.txt` |
+| [pyobjc-core](https://pypi.org/project/pyobjc-core/13.0/) | 13.0 | MIT | `third-party/PyObjC-LICENSE.txt` |
 
 These versions describe the inspected environment, not dependency pins or a
 claim that future versions have been reviewed. The package requires
-`pyobjc-framework-Cocoa>=12.2.2,<13`; its core dependency may resolve independently.
+`pyobjc-framework-Cocoa>=13.0,<14`; its core dependency may resolve independently.
 
-The shared notice remains an exact byte copy of Cocoa 12.2.2's installed
-`pyobjc_framework_cocoa-12.2.2.dist-info/licenses/LICENSE.txt` and its source
-archive's root `LICENSE.txt`. The installed core 12.2.2 distribution advertised
-MIT but omitted its license file. The matching `pyobjc_core-12.2.2.tar.gz` from
-PyPI contains `pyobjc_core-12.2.2/License.txt`; that file was confirmed
-byte-identical to the snapshot. Downloaded wheel and source-archive hashes were
+The shared notice remains an exact byte copy of Cocoa 13.0's installed
+`pyobjc_framework_cocoa-13.0.dist-info/licenses/LICENSE.txt` and its source
+archive's root `LICENSE.txt`. The installed core 13.0 distribution advertised
+MIT but omitted its license file. The matching `pyobjc_core-13.0.tar.gz` from
+PyPI contains `pyobjc_core-13.0/License.txt`; that file was confirmed
+byte-identical to the retained 12.2.2 snapshot. Downloaded wheel and source-archive hashes were
 verified against PyPI. Their URLs and hashes, the notice hash, and the core
 native module hash are recorded in `third-party/provenance.json`.
 

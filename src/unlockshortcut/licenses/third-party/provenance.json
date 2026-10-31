@@ -1,5 +1,5 @@
 {
-  "review_date": "2026-10-26",
+  "review_date": "2026-10-31",
   "scope": "Notice snapshots for separately installed dependencies; no dependency code is bundled in the UnlockShortcut wheel.",
   "notice": {
     "path": "PyObjC-LICENSE.txt",
@@ -8,43 +8,43 @@
   "dependencies": [
     {
       "name": "pyobjc-framework-Cocoa",
-      "version": "12.2.2",
+      "version": "13.0",
       "license": "MIT",
-      "notice_source": "pyobjc_framework_cocoa-12.2.2.dist-info/licenses/LICENSE.txt",
-      "upstream": "https://pypi.org/project/pyobjc-framework-Cocoa/12.2.2/",
+      "notice_source": "pyobjc_framework_cocoa-13.0.dist-info/licenses/LICENSE.txt",
+      "upstream": "https://pypi.org/project/pyobjc-framework-Cocoa/13.0/",
       "wheel": {
-        "url": "https://files.pythonhosted.org/packages/1f/1a/b99521999b9f54b89aad928ddff0faad507abfe33bc46599454bfa48a4b2/pyobjc_framework_cocoa-12.2.2-cp314-cp314-macosx_10_15_universal2.whl",
-        "sha256": "889d7bbd4ba2d4941078bfbbfb882138e51dbead27df006abfe0f2e0d49b5b2e",
-        "filename": "pyobjc_framework_cocoa-12.2.2-cp314-cp314-macosx_10_15_universal2.whl"
+        "url": "https://files.pythonhosted.org/packages/b4/bb/f683ec329180e1931c8d592c882defebca8810e019cf4bc8727fa36b7d89/pyobjc_framework_cocoa-13.0-cp314-cp314-macosx_10_15_universal2.whl",
+        "sha256": "88be6d452e7531f695ce6d41428aa74bcaade9ddbc50af592419b9f2fbb7c879",
+        "filename": "pyobjc_framework_cocoa-13.0-cp314-cp314-macosx_10_15_universal2.whl"
       },
       "source_archive": {
-        "url": "https://files.pythonhosted.org/packages/75/76/49c6da2c6a831020b4854ba20079d5a1030474bffc776b7b73c2eeff8c15/pyobjc_framework_cocoa-12.2.2.tar.gz",
-        "sha256": "c96c0ef69a71afbbb0e6a7d594b455c5fe47d62e0db376ee7a2b4b828c16ace9",
-        "filename": "pyobjc_framework_cocoa-12.2.2.tar.gz"
+        "url": "https://files.pythonhosted.org/packages/30/50/55a8779d35f1f86d795264cbd6fe62e35b2cf4fb8343fc888e99268c988a/pyobjc_framework_cocoa-13.0.tar.gz",
+        "sha256": "bb7a23941fc8d7866578dbc84e56140efd343a1d28510f530dd1dbf80807daf4",
+        "filename": "pyobjc_framework_cocoa-13.0.tar.gz"
       }
     },
     {
       "name": "pyobjc-core",
-      "version": "12.2.2",
+      "version": "13.0",
       "license": "MIT",
-      "notice_source": "pyobjc_core-12.2.2/License.txt",
+      "notice_source": "pyobjc_core-13.0/License.txt",
       "source_archive": {
-        "url": "https://files.pythonhosted.org/packages/a5/78/abc4ce5920305780aeb36b4067a86253378b36e29ba96673a3deb02eb03a/pyobjc_core-12.2.2.tar.gz",
-        "sha256": "3906452339cd06a3bb07df103c2511d4cb0f7a22d8771c0b802eba15d9a642b6",
-        "filename": "pyobjc_core-12.2.2.tar.gz"
+        "url": "https://files.pythonhosted.org/packages/83/58/7bab095330b8893e1ac58f3cf9710462c3242b600f8fa5db0d5dda795775/pyobjc_core-13.0.tar.gz",
+        "sha256": "ffe154462d14aa4852f424e9116f17b5f8d44f78fc0f6c4727e721a5fa7177da",
+        "filename": "pyobjc_core-13.0.tar.gz"
       },
       "installed_license_omitted": true,
       "observed_platform_tag": "cp314-cp314-macosx_10_15_universal2",
       "observed_libffi": "/usr/lib/libffi.dylib (dynamically linked system library)",
-      "upstream": "https://pypi.org/project/pyobjc-core/12.2.2/",
+      "upstream": "https://pypi.org/project/pyobjc-core/13.0/",
       "wheel": {
-        "url": "https://files.pythonhosted.org/packages/13/37/486d38a173b0b8dce973a3e13c74cf402ed1b8621586b5963bc9efd49a48/pyobjc_core-12.2.2-cp314-cp314-macosx_10_15_universal2.whl",
-        "sha256": "2062e8ad30a310441cd022544a897553408bebeaa7820d5edba3c96fd7fd693b",
-        "filename": "pyobjc_core-12.2.2-cp314-cp314-macosx_10_15_universal2.whl"
+        "url": "https://files.pythonhosted.org/packages/41/a5/463dc32a6c32cff57b4678298a13cd830d7ab09cfec3d7e80f20a2f414fd/pyobjc_core-13.0-cp314-cp314-macosx_10_15_universal2.whl",
+        "sha256": "fe470bd7b8163b4b8d216b1ebe5b227f01c0fa1c4e0085d7ccade269dec02bb0",
+        "filename": "pyobjc_core-13.0-cp314-cp314-macosx_10_15_universal2.whl"
       },
       "native_module": {
         "path": "objc/_objc.cpython-314-darwin.so",
-        "sha256": "23cac76376ea7549ccccc017314f9c636132aa7d73a85e8573416afcabc7933d",
+        "sha256": "65e08ae0d42e5d70051ebb3ffe5e537d2e308c49c6cbcea4e7300665d5913af2",
         "architectures": [
           "arm64",
           "x86_64"
